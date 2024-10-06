@@ -1,0 +1,28 @@
+[
+    {
+      "seatingCapacity": 2,
+      "seatingPreference": "indoor",
+      "available": true
+    },
+    {
+      "seatingCapacity": 4,
+      "seatingPreference": "outdoor",
+      "available": true
+    },
+    {
+      "seatingCapacity": 6,
+      "seatingPreference": "indoor",
+      "available": true
+    },
+    {
+      "seatingCapacity": 4,
+      "seatingPreference": "window",
+      "available": false
+    },
+    {
+      "seatingCapacity": 8,
+      "seatingPreference": "indoor",
+      "available": true
+    }
+  ]
+  
