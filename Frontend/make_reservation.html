@@ -1,0 +1,139 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Table Reservation</title>
+    <link rel="preload" href="background.jpg" as="image" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Open Sans", sans-serif;
+        background-image: url("background.jpg");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .reservation-container {
+        background-color: lightgray;
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 400px;
+      }
+
+      h1 {
+        margin-bottom: 30px;
+        font-size: 24px;
+        color: #333;
+        text-align: center;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+      }
+
+      input,
+      select {
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #333;
+      }
+
+      button {
+        padding: 12px;
+        background-color: #f4511e;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #f4511e;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reservation-container">
+      <h1>Reserve Your Table</h1>
+      <form id="reservation-form" autocomplete="off">
+        <label for="name">Full Name:</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Enter your name"
+          required
+        />
+
+        <label for="phone">Phone Number:</label>
+        <input
+          type="text"
+          id="phone"
+          name="phone"
+          placeholder="Enter your phone number"
+          required
+        />
+
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" name="date" required />
+
+        <label for="time">Select Time:</label>
+        <select id="time" name="time" required>
+          <option value="">Choose a time...</option>
+          <option value="6:00 PM">6:00 PM</option>
+          <option value="6:30 PM">6:30 PM</option>
+          <option value="7:00 PM">7:00 PM</option>
+          <option value="7:30 PM">7:30 PM</option>
+          <option value="8:00 PM">8:00 PM</option>
+        </select>
+
+        <label for="guests">Number of Guests:</label>
+        <input
+          type="number"
+          id="guests"
+          name="guests"
+          min="1"
+          max="10"
+          required
+        />
+
+        <label for="seating">Seating Preference:</label>
+        <select id="seating" name="seating" required>
+          <option value="indoor">Indoor</option>
+          <option value="outdoor">Outdoor</option>
+        </select>
+
+        <button type="submit">Reserve Table</button>
+      </form>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

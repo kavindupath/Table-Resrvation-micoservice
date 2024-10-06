@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservation Failure</title>
+    <link rel="preload" href="background.jpg" as="image" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Open Sans", sans-serif;
+        background-image: url("background.jpg");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .error-container {
+        background-color: lightgray;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 400px;
+        text-align: center;
+      }
+      h1 {
+        color: #dc3545;
+        margin-bottom: 20px;
+      }
+      p {
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+      a {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 600;
+      }
+      a:hover {
+        background-color: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-container">
+      <h1>Reservation Failed</h1>
+      <p id="error-message"></p>
+      <a href="make_reservation.html">Back to Reservation Page</a>
+    </div>
+
+    <script>
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get("message");
+
+      // Display error message
+      document.getElementById("error-message").innerText =
+        message ||
+        "There was an error with your reservation. Please try again.";
+    </script>
+  </body>
+</html>
