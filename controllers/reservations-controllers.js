@@ -4,8 +4,7 @@ const { validationResult } = require("express-validator");
 const Reservations = require("../models/Reservations");
 const User = require("../models/user");
 const Tables = require("../models/table");
-const mongoose= require('mongoose');
-
+const mongoose = require("mongoose");
 
 exports.getReservations = async (req, res, next) => {
   let ReservationList;
@@ -30,7 +29,10 @@ exports.getReservationsById = async (req, res, next) => {
   }
 
   if (!ReservationList) {
-    const error = new HttpError("Could not find a Reservations for a given id", 404);
+    const error = new HttpError(
+      "Could not find a Reservations for a given id",
+      404
+    );
     throw error; // already cancels the function execution so no need to call 'return'
   }
   //The toObject() method is usually used in Mongoose.
@@ -58,29 +60,27 @@ exports.getReservationsByUserId = async (req, res, next) => {
     );
     return next(error);
   }
-  res.json({ Reservations: Reservations.map((p) => p.toObject({ getters: true })) });
+  res.json({
+    Reservations: Reservations.map((p) => p.toObject({ getters: true })),
+  });
 };
 
 exports.createReservations = async (req, res, next) => {
+  console.log("make reservation");
+
+  console.log("req body", req.body);
   //validate the request
-  const validationError = validationResult(req);
-  if (!validationError.isEmpty()) {
-    console.log("Error in creating new Reservations");
-    return next(
-      new HttpError("invalid input passed please check your data", 422)
-    ); // for async function use next() instead of throw
-  }
+  // const validationError = validationResult(req);
+  // if (!validationError.isEmpty()) {
+  //   console.log("Error in creating new Reservations");
+  //   return next(
+  //     new HttpError("invalid input passed please check your data", 422)
+  //   ); // for async function use next() instead of throw
+  // }
 
   //get the data from the request body
-  const {
-    name,
-    email,
-    mobileNumber,
-    date,
-    time,
-    noOfGuests,
-    seatingPreference,
-  } = req.body;
+  const { name, mobileNumber, date, time, noOfGuests, seatingPreference } =
+    req.body;
 
   // Check available tables based on the number of guests and seating preference
   let availableTable;
@@ -90,9 +90,9 @@ exports.createReservations = async (req, res, next) => {
 
   try {
     console.log(`Checking for available tables on ${date} at ${time}`);
-    availableTable = await Tables.findOneAndUpdate(
+    availableTable = await Tables.findOne(
       {
-        available: true,
+        // available: true,
         seatingCapacity: { $gte: noOfGuests },
         seatingPreference: seatingPreference,
         reservations: {
@@ -100,12 +100,14 @@ exports.createReservations = async (req, res, next) => {
             $elemMatch: { date: date, time: time },
           },
         },
-      },
-      { available: false }, // Mark the table as unavailable for further reservations
-      { new: true, session: sess } // Return the updated table and use the session for the transaction
+      }
+      // { available: false }, // Mark the table as unavailable for further reservations
+      // { new: true, session: sess } // Return the updated table and use the session for the transaction
     );
 
-
+    if (availableTable) {
+      console.log("available", availableTable);
+    }
     // If no table is found, abort the reservation process
     if (!availableTable) {
       await sess.abortTransaction(); // Abort transaction if no table is found
@@ -118,11 +120,10 @@ exports.createReservations = async (req, res, next) => {
     //create a new Reservations object
     const createdReservations = new Reservations({
       name,
-      email,
+      mobileNumber,
       date,
       time,
       noOfGuests,
-      mobileNumber,
       seatingPreference,
       assignedTable: availableTable._id,
     });
@@ -131,7 +132,9 @@ exports.createReservations = async (req, res, next) => {
     await createdReservations.save({ session: sess });
 
     // Add the reservation details to the table's reservation list for the specific date and time
+
     availableTable.reservations.push({ date, time });
+    availableTable.available = false;
     await availableTable.save({ session: sess });
 
     // Commit the transaction
@@ -179,7 +182,7 @@ exports.createReservations = async (req, res, next) => {
 
     res.status(200).json({
       Reservations: createdReservations,
-      status:"Success",
+      status: "Success",
       assignedTable: {
         tableId: availableTable._id, // Ensure this is the same ObjectId as assignedTable in the reservation
         seatingCapacity: availableTable.seatingCapacity,
@@ -224,7 +227,9 @@ exports.updateReservations = async (req, res, next) => {
     return;
   }
 
-  res.status(200).json({ Reservations: updatedReservations.toObject({ getters: true }) });
+  res
+    .status(200)
+    .json({ Reservations: updatedReservations.toObject({ getters: true }) });
 };
 
 exports.deleteReservations = async (req, res, next) => {
@@ -232,7 +237,9 @@ exports.deleteReservations = async (req, res, next) => {
   let Reservations;
 
   try {
-    Reservations = await Reservations.findById(Reservationsid).populate('Table'); //populate() method is used to retrieve referenced data from another collection. In this case, it seems like the creator field of the Reservations document is referencing data from another collection (e.g., a User collection). By using populate('creator'), the code will automatically fetch the referenced data from the User collection and attach it to the retrieved Reservations document.
+    Reservations = await Reservations.findById(Reservationsid).populate(
+      "Table"
+    ); //populate() method is used to retrieve referenced data from another collection. In this case, it seems like the creator field of the Reservations document is referencing data from another collection (e.g., a User collection). By using populate('creator'), the code will automatically fetch the referenced data from the User collection and attach it to the retrieved Reservations document.
     console.log(Reservations);
   } catch (error) {
     console.log("Somehting went wrong");
@@ -246,15 +253,14 @@ exports.deleteReservations = async (req, res, next) => {
   }
 
   try {
-    const sess= await mongoose.startSession();
+    const sess = await mongoose.startSession();
     sess.startTransaction();
-    await Reservations.remove({session:sess});
+    await Reservations.remove({ session: sess });
     //remove Reservations from user
     Reservations.creator.Reservations.pull(Reservations);
-    await Reservations.creator.save({session:sess});
+    await Reservations.creator.save({ session: sess });
     await sess.commitTransaction();
     console.log("Reservations removed");
-    
   } catch (error) {
     console.log("Could not delete Reservations" + error);
     res.status(500).json({ message: "Could not delete Reservations" });
@@ -262,5 +268,3 @@ exports.deleteReservations = async (req, res, next) => {
   }
   res.status(200).json({ message: "Delete the  Reservations" });
 };
-
-
