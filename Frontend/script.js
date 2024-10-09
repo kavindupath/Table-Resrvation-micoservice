@@ -50,48 +50,52 @@ document
       body: JSON.stringify(reservationData), // Send the reservation data
     })
       .then((response) => {
-        // alert(response);
-
         console.log("Response", response);
         // Check if the server response is successful
         if (!response.ok) {
           // throw new Error("Network response was not ok");
           alert("No available tables matching the criteria.");
-          window.location.href = "reservation_failed.html";
-
+          window.location.href = "reservation_unavailable.html";
           return;
-        } else {
-          window.location.href = "reservation_confirmation.html";
-          alert("Reservation success");
         }
-        // return response.json(); // Convert the response to JSON
+
+        // else {
+        //   //queryParams = new URLSearchParams(response).toString();
+        //   window.location.href = "reservation_confirmation.html";
+        //   alert("Reservation success");
+        // }
+        return response.json(); // Convert the response to JSON
       })
       .then((data) => {
-        // // Enable the button again after receiving a response
-        // submitButton.disabled = false;
-        // submitButton.textContent = "Reserve Table";
-        // window.location.href = "reservation_confirmation.html";
-        // alert("Reservation success");
-        // // Handle the server response
-        // if (data.status === "success") {
-        //   // Redirect to the confirmation page
-        //   //   window.location.href = `reservation_confirmation.html?name=${encodeURIComponent(
-        //   //     name
-        //   //   )}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(
-        //   //     time
-        //   //   )}&guests=${encodeURIComponent(guests)}&seating=${encodeURIComponent(
-        //   //     seating
-        //   //   )}&reservationID=${encodeURIComponent(data.reservationID)}`;
-        //   // } else if (data.status === "unavailable") {
-        //   //   // Redirect to the unavailable page
-        //   //   window.location.href = `reservation_unavailable.html?date=${encodeURIComponent(
-        //   //     date
-        //   //   )}&time=${encodeURIComponent(time)}`;
-        //   // window.location.href = "reservation_confirmation.html";
-        // } else if (data.status === "failed") {
-        //   // Redirect to the failed page
-        //   window.location.href = "reservation_failed.html";
-        // }
+        // If `data` is received successfully, create queryParams
+        if (data) {
+          // Convert the data object to query parameters
+          // Extract relevant fields from the response
+          const {
+            name,
+            mobileNumber,
+            date,
+            time,
+            noOfGuests,
+            seatingPreference,
+            assignedTable,
+          } = data.Reservations;
+
+          // Prepare data to pass as query parameters
+          const queryParams = new URLSearchParams({
+            name,
+            mobileNumber,
+            date,
+            time,
+            noOfGuests,
+            seatingPreference,
+            assignedTable,
+          }).toString();
+
+          // Redirect to the confirmation page with the query parameters
+          alert("Reservation success");
+          window.location.href = `reservation_confirmation.html?${queryParams}`;
+        }
       })
       .catch((error) => {
         // Handle network errors or unexpected responses
