@@ -1,0 +1,7 @@
+CaseID,TaskID,Timestamp,Resource,Message
+UGU100,1,2024-10-15T12:18:39.764Z,UserManagementService,User login successful
+UGU100,1,2024-10-15T12:19:59.639Z,run_application,Application started
+UGU100,1,2024-10-15T12:21:29.422Z,run_application,Application started
+UGU100,1,2024-10-15T12:25:07.472Z,run_application,Application started
+UGU100,1,2024-10-15T12:29:29.677Z,run_application,Application started
+UGU100,1,2024-10-15T12:32:12.866Z,run_application,Application started

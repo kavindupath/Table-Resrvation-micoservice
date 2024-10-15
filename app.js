@@ -6,6 +6,9 @@ var cors = require("cors");
 
 const reservationsRoutes = require("./routes/reservationRoutes");
 const usersRoutes = require("./routes/users-route");
+const logger = require('./utils/logger');
+
+
 
 const app = express();
 var httpServer = require("http").createServer(app);
@@ -45,7 +48,14 @@ mongoose
     //app.listen(5000);
     httpServer.listen(PORT, () => console.log(`Server started on port ${PORT}`));
     console.log("mongo db connected");
+    logger.info({
+      message: 'Application started',
+      resource: 'run_application'  // Custom resource value
+    });
+
   })
   .catch((err) => {
     console.log(err);
+    logger.error('An error occurred');
+
   });

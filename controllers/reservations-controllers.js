@@ -5,6 +5,8 @@ const Reservations = require("../models/Reservations");
 const User = require("../models/user");
 const Tables = require("../models/table");
 const mongoose = require("mongoose");
+const logger = require('../utils/logger');
+
 
 exports.getReservations = async (req, res, next) => {
   let ReservationList;
@@ -90,6 +92,10 @@ exports.createReservations = async (req, res, next) => {
 
   try {
     console.log(`Checking for available tables on ${date} at ${time}`);
+    logger.info({
+      message: 'fetching table availability',
+      resource: 'check_availability'  // Custom resource value
+    });
     availableTable = await Tables.findOne(
       {
         // available: true,
@@ -107,14 +113,25 @@ exports.createReservations = async (req, res, next) => {
 
     if (availableTable) {
       console.log("available", availableTable);
+      logger.info({
+        message: 'table available',
+        resource: 'table_availability'  // Custom resource value
+      });
     }
     // If no table is found, abort the reservation process
     if (!availableTable) {
+      logger.info({
+        message: 'table unavailable',
+        resource: 'table_availability'  // Custom resource value
+      });
       await sess.abortTransaction(); // Abort transaction if no table is found
       sess.endSession();
+      logger.error('No table is available for the selected date and time');
       return next(
         new HttpError("No available tables matching the criteria.", 404)
+        
       );
+      
     }
 
     //create a new Reservations object
@@ -132,6 +149,10 @@ exports.createReservations = async (req, res, next) => {
     await createdReservations.save({ session: sess });
 
     // Add the reservation details to the table's reservation list for the specific date and time
+    logger.info({
+      message: 'adding reservation',
+      resource: 'add_reservation'  // Custom resource value
+    });
 
     availableTable.reservations.push({ date, time });
     availableTable.available = false;
@@ -142,6 +163,11 @@ exports.createReservations = async (req, res, next) => {
 
     // End the session
     sess.endSession();
+    logger.info({
+      message: 'reservation successful',
+      resource: 'add_reservation_success'  // Custom resource value
+    });
+   
     //Find a user with the given user ID
     // let user;
     // try {
@@ -194,6 +220,10 @@ exports.createReservations = async (req, res, next) => {
   } catch (err) {
     // If any error occurs, abort the transaction and return an error response
     await sess.abortTransaction();
+    logger.info({
+      message: 'reservation unsuccessful',
+      resource: 'add_reservation_fail'  // Custom resource value
+    });
     return next(new HttpError("Reservation process failed.", 500));
   } finally {
     sess.endSession(); // Ensure the session ends in all scenarios
